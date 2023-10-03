@@ -10,4 +10,24 @@ conda install pytorch=1.10.2 cudatoolkit=11.3 -c pytorch -y
 bash setup.sh 
 ```
 
+<h2>Training</h2>
+Taking myoglobin as an example, we can train the model via the following scripts:
+```ruby
+bash train.sh
+```
+
+<h2>Inference</h2>
+Taking myoglobin as an example, we can design myoglobins via the following scripts:
+```ruby
+bash design.sh
+```
+There are five items in the output directory:
+
+1. protein.txt refers to the designed protein sequence
+2. src.seq.txt refers to the ground truth sequences
+3. pdb.txt refers to the target PDB ID and the corresponding chains
+4. pred_pdbs refers to the directory of designed pdbs
+5. tgt_pdbs refers to the directory of target pdbs
+
+
 
