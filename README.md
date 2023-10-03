@@ -1,4 +1,6 @@
 <h1>Code, Model and Data for NAEPro</h1>
+![image](https://github.com/JocelynSong/NAEPro/blob/main/NAEPro_model.pdf)
+
 
 <h2>Installation</h2>
 The dependencies can be set up using the following commands:
