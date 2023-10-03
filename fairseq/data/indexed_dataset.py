@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import json
 import random
 import shutil
 import struct
@@ -74,16 +75,16 @@ def make_builder(out_file, impl, vocab_size=None):
 
 
 def make_dataset(path, impl, fix_lua_indexing=False, dictionary=None, source=True, sizes=None, motif_list=None,
-                 epoch=1, train=True):
+                 epoch=1, train=True, split="train"):
     if impl == "raw" and IndexedRawTextDataset.exists(path):
         assert dictionary is not None
-        return IndexedRawTextDataset(path, dictionary, source=source)
+        return IndexedRawTextDataset(path, dictionary, source=source, split=split)
     elif impl == "coor" and CoordinateDataset.exists(path):
-        return CoordinateDataset(path, motif_list)
+        return CoordinateDataset(path, motif_list, split=split)
     elif impl == "motif" and ProteinMotifDataset.exists(path):
-        return ProteinMotifDataset(path, sizes, epoch, train)
+        return ProteinMotifDataset(path, sizes, epoch, train, split=split)
     elif impl == "pdb" and ProteinPDBDataset.exists(path):
-        return ProteinPDBDataset(path)
+        return ProteinPDBDataset(path, split=split)
     elif impl == "lazy" and IndexedDataset.exists(path):
         return IndexedDataset(path, fix_lua_indexing=fix_lua_indexing)
     elif impl == "cached" and IndexedDataset.exists(path):
@@ -274,19 +275,23 @@ class IndexedRawTextDataset(FairseqDataset):
     """Takes a text file as input and binarizes it in memory at instantiation.
     Original lines are also kept in memory"""
 
-    def __init__(self, path, dictionary, source=True, append_eos=True, reverse_order=False):
+    def __init__(self, path, dictionary, source=True, append_eos=True, reverse_order=False, split="train"):
         self.tokens_list = []
         self.lines = []
         self.sizes = []
         self.source = source
         self.append_eos = append_eos
         self.reverse_order = reverse_order
-        self.read_data(path, dictionary)
+        self.read_data(path, dictionary, split)
         self.size = len(self.tokens_list)
 
-    def read_data(self, path, dictionary):
-        with open(path, "r", encoding="utf-8") as f:
-            for line in f.readlines():
+    def read_data(self, path, dictionary, split):
+        f = open(path)
+        data = json.load(f)
+        lines = data[split]["seq"]
+        # with open(path, "r", encoding="utf-8") as f:
+        #     for line in f.readlines():
+        for line in lines:
                 line = line.strip()
                 self.lines.append(line)
                 if self.source:
@@ -339,17 +344,21 @@ class CoordinateDataset(FairseqDataset):
     Takes a text file as input and binarizes it in memory at instantiation.
     Original lines are also kept in memory"""
 
-    def __init__(self, path, motif_list):
+    def __init__(self, path, motif_list, split="train"):
         self.coors_list = []
         self.lines = []
         self.sizes = []
         self.centers = []
-        self.read_data(path, motif_list)
+        self.read_data(path, motif_list, split)
         self.size = len(self.coors_list)
 
-    def read_data(self, path, motif_list):
-        with open(path, "r", encoding="utf-8") as f:
-            for ind, line in enumerate(f.readlines()):
+    def read_data(self, path, motif_list, split):
+        f = open(path)
+        data = json.load(f)
+        lines = data[split]["struct"]
+        # with open(path, "r", encoding="utf-8") as f:
+        #     for ind, line in enumerate(f.readlines()):
+        for ind, line in enumerate(lines):
                 line = line.strip()
                 self.lines.append(line)
                 coors = line.split(",")
@@ -402,16 +411,20 @@ class ProteinMotifDataset(FairseqDataset):
     Takes a text file as input and binarizes it in memory at instantiation.
     Original lines are also kept in memory"""
 
-    def __init__(self, path, dataset_sizes, epoch, train):
+    def __init__(self, path, dataset_sizes, epoch, train, split="train"):
         self.motif_list = []
         self.sizes = []
         self.epoch = epoch
-        self.read_data(path, dataset_sizes, self.epoch, train)
+        self.read_data(path, dataset_sizes, self.epoch, train, split)
         self.size = len(self.motif_list)
 
-    def read_data(self, path, dataset_sizes, epoch, train):
-        with open(path, "r", encoding="utf-8") as f:
-            for line, size in zip(f.readlines(), dataset_sizes):
+    def read_data(self, path, dataset_sizes, epoch, train, split):
+        f = open(path)
+        data = json.load(f)
+        lines = data[split]["motif"]
+        # with open(path, "r", encoding="utf-8") as f:
+        #     for line, size in zip(f.readlines(), dataset_sizes):
+        for line, size in zip(lines, dataset_sizes):
                 mask = np.ones(size)
                 line = line.strip()
                 indexes = line.split(",")
@@ -469,17 +482,21 @@ class ProteinPDBDataset(FairseqDataset):
     Takes a text file as input and binarizes it in memory at instantiation.
     Original lines are also kept in memory"""
 
-    def __init__(self, path):
+    def __init__(self, path, split="train"):
         self.pdb_list = []
         self.sizes = []
-        self.read_data(path)
+        self.read_data(path, split)
         self.size = len(self.pdb_list)
 
-    def read_data(self, path):
-        with open(path, "r", encoding="utf-8") as f:
-            for line in f.readlines():
-                self.pdb_list.append(line.strip())
-                self.sizes.append(len(line.strip()))
+    def read_data(self, path, split):
+        f = open(path)
+        data = json.load(f)
+        lines = data[split]["pdb"]
+        # with open(path, "r", encoding="utf-8") as f:
+        #     for line in f.readlines():
+        for line in lines:
+            self.pdb_list.append(line.strip())
+            self.sizes.append(len(line.strip()))
         self.sizes = np.array(self.sizes)
 
     def check_index(self, i):

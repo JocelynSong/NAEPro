@@ -72,7 +72,7 @@ def collate_tokens(
 
 def load_indexed_dataset(
     path, dictionary=None, dataset_impl=None, combine=False, default="cached", source=True, sizes=None, motif_list=None,
-    epoch=1, train=True,
+    epoch=1, train=True, split="train"
 ):
     """A helper function for loading indexed datasets.
 
@@ -114,6 +114,7 @@ def load_indexed_dataset(
             motif_list=motif_list,
             epoch=epoch,
             train=train,
+            split=split
         )
         if dataset is None:
             break

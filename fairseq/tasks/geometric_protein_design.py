@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 def load_protein_dataset(
     data_path,
     split,
-    src_protein,
+    protein,
     src_dict,
     dataset_impl_source,
     dataset_impl_target,
@@ -66,72 +66,37 @@ def load_protein_dataset(
     prepend_bos_src=None,
     epoch=1,
 ):
-    def split_exists(split, dataset_impl):
-        filename = os.path.join(data_path, "{}.seq.txt".format(split))
-        return indexed_dataset.dataset_exists(filename, impl=dataset_impl)
-
-    src_datasets = []
-    tgt_datasets = []
-    motif_datasets = []
-    pdb_datasets = []
-
-    for k in itertools.count():
-        split_k = split + (str(k) if k > 0 else "")
-
-        # infer langcode
-        if split_exists(split_k, dataset_impl_source):
-            prefix = os.path.join(data_path, "{}.".format(split_k))
-        else:
-            if k > 0:
-                break
-            else:
-                raise FileNotFoundError(
-                    "Dataset not found: {} ({})".format(split, data_path)
-                )
-
-        src_dataset = data_utils.load_indexed_dataset(
-            prefix + "seq.txt", src_dict, dataset_impl_source, source=True
-        )
-        if truncate_source:
-            src_dataset = AppendTokenDataset(
-                TruncateDataset(
-                    StripTokenDataset(src_dataset, src_dict.eos()),
-                    max_source_positions - 1,
-                ),
-                src_dict.eos(),
-            )
-        src_datasets.append(src_dataset)
-
-        if split == "train":
-            train = True
-        else:
-            train = False
-        motif_dataset = data_utils.load_indexed_dataset(
-            prefix + "motif.txt", src_dict, "motif", source=False, sizes=src_dataset.sizes, epoch=epoch, train=train
-        )
-        motif_datasets.append(motif_dataset)
-
-        tgt_dataset = data_utils.load_indexed_dataset(
-            prefix + "struct.txt", src_dict, dataset_impl_target, source=False, motif_list=motif_dataset.motif_list,
-        )
-        if tgt_dataset is not None:
-            tgt_datasets.append(tgt_dataset)
-
-        pdb_dataset = data_utils.load_indexed_dataset(prefix + "pdb.txt", dataset_impl="pdb")
-        pdb_datasets.append(pdb_dataset)
-
-        logger.info(
-            "{} {} {} examples".format(
-                data_path, split_k, len(src_datasets[-1])
-            )
+    src_dataset = data_utils.load_indexed_dataset(
+        data_path, src_dict, dataset_impl_source, source=True, split=split
+    )
+    if truncate_source:
+        src_dataset = AppendTokenDataset(
+            TruncateDataset(
+                StripTokenDataset(src_dataset, src_dict.eos()),
+                max_source_positions - 1,
+            ),
+            src_dict.eos(),
         )
 
-    assert len(src_datasets) == len(tgt_datasets) == len(motif_datasets) == len(pdb_datasets)
+    if split == "train":
+        train = True
+    else:
+        train = False
+    motif_dataset = data_utils.load_indexed_dataset(
+        data_path, src_dict, "motif", source=False, sizes=src_dataset.sizes, epoch=epoch, train=train, split=split
+    )
 
-    src_dataset = src_datasets[0]
-    tgt_dataset = tgt_datasets[0] if len(tgt_datasets) > 0 else None
-    motif_dataset = motif_datasets[0]
-    pdb_dataset = pdb_datasets[0]
+    tgt_dataset = data_utils.load_indexed_dataset(
+        data_path, src_dict, dataset_impl_target, source=False, motif_list=motif_dataset.motif_list, split=split
+    )
+
+    pdb_dataset = data_utils.load_indexed_dataset(data_path, dataset_impl="pdb", split=split)
+
+    logger.info(
+        "{} {} {} examples".format(
+            data_path, split, len(src_dataset
+        )
+    ))
 
     return ProteinDataset(
         src_dataset,
@@ -163,7 +128,7 @@ class GeometricProteinDesignConfig(FairseqDataclass):
         },
     )
     protein_task: str = field(
-        default="avGFP",
+        default="myoglobin",
         metadata={"help": "protein task name"}
     )
     source_lang: Optional[str] = field(
