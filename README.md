@@ -12,6 +12,7 @@ bash setup.sh
 
 <h2>Training</h2>
 Taking myoglobin as an example, we can train the model via the following scripts:
+
 ```ruby
 bash train.sh
 ```
