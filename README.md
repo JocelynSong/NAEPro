@@ -18,9 +18,11 @@ bash train.sh
 
 <h2>Inference</h2>
 Taking myoglobin as an example, we can design myoglobins via the following scripts:
+
 ```ruby
 bash design.sh
 ```
+
 There are five items in the output directory:
 
 1. protein.txt refers to the designed protein sequence
