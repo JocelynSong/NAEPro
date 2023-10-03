@@ -1,5 +1,5 @@
 <h1>Code, Model and Data for NAEPro</h1>
-![image](https://github.com/JocelynSong/NAEPro/blob/main/NAEPro_model.pdf)
+![Image text](https://github.com/JocelynSong/NAEPro/blob/main/NAEPro_model.pdf)
 
 
 <h2>Installation</h2>
