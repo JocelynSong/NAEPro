@@ -16,10 +16,11 @@ bash setup.sh
 ```
 
 <h2>Download Models</h2>
+
 We provide the checkpoints used in the paper in [Google Drive](https://drive.google.com/drive/folders/1E_baD7oihpFmJtilOVblDkHSvca8rUuO?usp=sharing) 
 
-Please download the checkpoints and put them in the models folder. 
 
+Please download the checkpoints and put them in the models folder.
 If you want to train your own model, please follow the training guidance below
 
 <h2>Training</h2>
