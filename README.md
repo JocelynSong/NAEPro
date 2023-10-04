@@ -21,6 +21,7 @@ We provide the checkpoints used in the paper in [Google Drive](https://drive.goo
 
 
 Please download the checkpoints and put them in the models folder.
+
 If you want to train your own model, please follow the training guidance below
 
 <h2>Training</h2>
