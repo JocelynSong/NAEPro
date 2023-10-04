@@ -1,4 +1,4 @@
-<h1>Code, Model and Data for NAEPro</h1>
+<h1>Functional Geometry Guided Protein Sequence and Backbone Structure Co-Design</h1>
 
 <h2>Model Architecture</h2>
 
