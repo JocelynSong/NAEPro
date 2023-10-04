@@ -16,7 +16,7 @@ bash setup.sh
 ```
 
 <h2>Download Models</h2>
-We provide the checkpoints used in the paper in Google Drive [models](https://drive.google.com/drive/folders/1E_baD7oihpFmJtilOVblDkHSvca8rUuO?usp=sharing) 
+We provide the checkpoints used in the paper in [Google Drive](https://drive.google.com/drive/folders/1E_baD7oihpFmJtilOVblDkHSvca8rUuO?usp=sharing) 
 
 Please download the checkpoints and put them in the models folder. 
 
