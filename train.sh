@@ -18,6 +18,7 @@ python3 fairseq_cli/train.py ${data_path} \
 --encoder-embed-dim 320 \
 --decoder-layers 6 \
 --pretrained-esm-model ${pretrained_model} \
+--egnn-mode "rm-node" \
 --dropout 0.3 \
 --optimizer adam --adam-betas '(0.9,0.98)' \
 --lr 5e-4 --lr-scheduler inverse_sqrt \
